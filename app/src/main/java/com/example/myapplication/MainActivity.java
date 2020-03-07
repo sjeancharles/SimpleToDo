@@ -46,38 +46,46 @@ public class MainActivity extends AppCompatActivity {
         //items.add("Have a fun");
         loadItems();
 
-        ItemsAdapter.OnLongClickListener onLongClickListener= new ItemsAdapter.OnLongClickListener(){
-
+        ItemsAdapter.OnLongClickListener onLongClickListener = new ItemsAdapter.OnLongClickListener(){
             @Override
             public void onItemLongClicked(int position) {
+                //Delete the item from the model
                 items.remove(position);
+                //Notify the adapter
                 itemsAdapter.notifyItemRemoved(position);
                 Toast.makeText(getApplicationContext(),"Item was removed",Toast.LENGTH_SHORT).show();
                 saveItems();
             }
         };
+
         ItemsAdapter.OnClickListener onClickListener = new ItemsAdapter.OnClickListener() {
             @Override
             public void onItemClicked(int position) {
                 Log.d("MainActivity", "Single click at position" + position);
+
+                //create the new activity
                 Intent i = new Intent(MainActivity.this, EditActivity.class);
+                // pass the data being edited
                 i.putExtra(KEY_ITEM_TEXT, items.get(position));
                 i.putExtra(KEY_ITEM_POSITION, position);
+                // display the activity
                 startActivityForResult(i, EDIT_TEXT_CODE);
+
             }
         };
-        final ItemsAdapter itemsAdapter = new ItemsAdapter(items, onLongClickListener, onClickListener);
+
+        itemsAdapter = new ItemsAdapter(items, onLongClickListener, onClickListener);
         rvItems.setAdapter(itemsAdapter);
-        rvItems.setLayoutManager(new LinearLayoutManager(this ));
+        rvItems.setLayoutManager(new LinearLayoutManager(this));
 
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String todoItem = etItem.getText().toString();
-
+                //Add item to the model
                 items.add(todoItem);
-
-                itemsAdapter.notifyItemInserted(items.size() -1);
+                //Notify Adapter that an item is inserted
+                itemsAdapter.notifyItemInserted(items.size()-1);
                 etItem.setText("");
                 Toast.makeText(getApplicationContext(),"Item was added",Toast.LENGTH_SHORT).show();
                 saveItems();
@@ -87,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK && requestCode == EDIT_TEXT_CODE){
             // Retreive the updated text value
 
@@ -104,13 +113,16 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Item updated successfully",Toast.LENGTH_SHORT).show();
         }
         else{
-            Log.v("MainActivity", "Unknown call to onActivityResult");
+            Log.v("MainActivity", "Unknown call to onctivitiResult");
         }
     }
 
     private File getDataFile(){
         return new File(getFilesDir(),"data.txt");
     }
+
+    //This function will load items by reading every line of the data file
+
     private void loadItems(){
         try{
 
@@ -121,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
             items = new ArrayList<>();
         }
     }
+    // This function saves items by writing them into the data file
     private  void saveItems(){
         try{
 
